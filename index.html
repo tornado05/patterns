@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>Dispatcher</div>
+        <select id="master" onchange="masterChange()">
+            <option value="ua">UA</option>
+            <option value="en">EN</option>
+        </select>
+        <select id="slave" onchange="slaveChange()"></select>
+        <select id="next"></select>
+        <script type="text/javascript">
+            var dispatcher = (function () {
+                
+                var eventListeners = [];
+                
+                var addListener = function (event, listener) {
+                    eventListeners.push({
+                        event: event,
+                        listener: listener
+                    });
+                };
+                var removeListener = function(event, listener) {
+                    // TODO: add logic to remove
+                };
+                var notify = function (event) {
+                    for (var i = 0; i < eventListeners.length; ++i) {
+                        if (eventListeners[i].event == event.name) {
+                            eventListeners[i].listener(event);
+                        }
+                    }
+                };
+                
+                return {
+                    addListener: addListener,
+                    removeListener: removeListener,
+                    notify: notify
+                };
+            })();
+            
+            (function () {
+                var renderSlaveOptions = function (event) {
+                    console.log('renderSlaveOptions');
+                    console.log(event);
+                    var option = null;  
+                    clearSlaveOptions('slave');                    
+                    if (event.masterValue == 'ua') {
+                        option = createSlaveOption('опція 1', 'ua-option-1');
+                        document.getElementById('slave').add(option);
+                        option = createSlaveOption('опція 2', 'ua-option-2');
+                        document.getElementById('slave').add(option);
+                    } else {
+                        option = createSlaveOption('option 1', 'us-option-1');
+                        document.getElementById('slave').add(option);
+                        option = createSlaveOption('option 2', 'us-option-2');
+                        document.getElementById('slave').add(option);
+                    }                                        
+                };
+                
+                var renderNextOptions = function (event) {
+                    console.log('renderNextOptions');
+                    console.log(event);
+                    var option = null;  
+                    clearSlaveOptions('next');
+                    if (event.slaveValue) {
+                        return;
+                    }
+                    if (event.masterValue == 'ua') {
+                        option = createSlaveOption('я повернусь', 'ua-back');
+                    } else {
+                        option = createSlaveOption('I will be back', 'us-back');
+                    }                    
+                    document.getElementById('next').add(option);
+                };
+                
+                dispatcher.addListener('master-change', renderSlaveOptions);
+                dispatcher.addListener('master-change', renderNextOptions);
+                dispatcher.addListener('slave-change', renderNextOptions);
+            })();
+            
+            function masterChange() {
+                  var value = document.getElementById('master').value;
+                  dispatcher.notify({
+                      name: 'master-change',
+                      masterValue: value
+                  });
+            };
+            
+            function slaveChange() {
+                var value = document.getElementById('slave').value;
+                  dispatcher.notify({
+                      name: 'slave-change',
+                      slaveValue: value
+                  });
+            };
+            
+            function createSlaveOption(text, value) {
+                var option = document.createElement('option');
+                option.text = text;
+                option.value = value;
+                return option;
+            }
+            
+            function clearSlaveOptions(selectId) {
+                var select = document.getElementById(selectId);
+                while(select.options.length > 0) {
+                    select.remove('option');
+                }
+            }                        
+        </script>
+    </body>
+</html>
