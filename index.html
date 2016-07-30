@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Singleton</title>
+	</head>
+	<body>
+		<h1>Singleton</h1>
+		<div id="a"></div>
+		<div id="b"></div>
+		<script type="text/javascript">
+			var containerA = document.getElementById("a");
+			var containerB = document.getElementById("b");
+			console.log(containerA);
+			console.log(containerB);
+
+			var module = (function () {
+				
+				var val = parseInt(Math.random(1, 5) * 100);
+
+				var getVal = function () {
+					return val;
+				};
+
+				return {
+					getVal: getVal
+				};
+			})();
+
+			containerA.innerHTML += " " + module.getVal();
+			containerB.innerHTML += " " +  module.getVal();
+
+			var AnotherModule = function () {
+				var val = parseInt(Math.random(1, 5) * 100);
+
+				var getVal = function () {
+					return val;
+				};
+
+				return {
+					getVal: getVal
+				};
+			};
+
+			var NotSingletonModule = function () {
+				var val = parseInt(Math.random(1, 5) * 100);
+
+				var getVal = function () {
+					return val;
+				};				
+
+				return {
+					getVal: getVal
+				};
+			};
+
+			var instance = new NotSingletonModule();
+			var anotherInstance = new NotSingletonModule();
+
+			console.log(NotSingletonModule);
+			console.log(instance.getVal());
+			console.log(anotherInstance.getVal());
+
+			var AnotherModuleWrapper = (function () {
+				var module = function () {
+					var val = parseInt(Math.random(1, 5) * 100);
+
+					var getVal = function () {
+						return val;
+					};
+
+					return {
+						getVal: getVal
+					};
+				};
+
+				var instance = null;
+
+				var getInstance = function (id) {
+					if (!instance) {
+						instance = new module();
+					}
+					instance.id = id;
+					return instance;
+				};
+
+				return {
+					getInstance: getInstance
+				};
+			})();
+
+			containerA.innerHTML += " " +  new AnotherModule().getVal();
+			containerB.innerHTML += " " +  new AnotherModule().getVal();
+
+			var instanceA = AnotherModuleWrapper.getInstance('i1');		
+			console.log(instanceA.id);
+			var instanceB = AnotherModuleWrapper.getInstance('i2');
+
+			console.log(instanceA.id);
+			console.log(instanceB.id);
+
+			containerA.innerHTML += " " +  instanceA.getVal();
+			containerB.innerHTML += " " +  instanceB.getVal();
+
+
+			//===========================================================================
+
+			var User = function (login, pw, firstName, secondName) {
+
+				var isCurrentUser = function (l, p) {
+					return l === login && p === pw;
+				};
+
+				var getFullName = function () {
+					return firstName + " " + secondName;
+				};
+
+				return {
+					getFullName: getFullName,
+					isCurrentUser: isCurrentUser
+				};
+			};
+
+			var userA = new User('A', 'a', 'AAA', 'ZZZ');
+			var userB = new User('B', 'b', 'BBB', 'ZZZ');
+
+			function printFullName(user) {
+				console.log(user.getFullName());
+			};
+
+			function authenticate(login, pw) {
+
+				// user[i].isCurrentUSer(login, pw)
+				return userA.isCurrentUser(login, pw);
+			};
+
+			printFullName(userA);
+			printFullName(userB);
+
+		</script>
+	</body>
+</html>
